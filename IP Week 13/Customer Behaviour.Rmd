@@ -1,0 +1,146 @@
+---
+title: "Customer Behaviour"
+author: "Mercy M. Kubania"
+date: "7/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Definition
+
+Kira Plastinina  is a Russian brand that is sold through a defunct chain of retail stores in Russia, Ukraine, Kazakhstan, Belarus, China, Philippines, and Armenia. The brand’s Sales and Marketing team would like to understand their customer’s behavior from data that they have collected over the past year. More specifically, they would like to learn the characteristics of customer groups.
+
+### a)Specifying the Question
+1. Perform clustering stating insights drawn from your analysis and visualizations.
+
+2. Provide comparisons between the approaches learned this week i.e. K-Means clustering vs Hierarchical clustering highlighting the strengths and limitations of each approach in the context of your analysis. 
+
+
+### b)The metric of Success
+Be able to understand the characteristics of Kira Plastinina Customers by using unsupervised machine learning algorithms
+
+### c)The Context
+Study of online shoppers for specifically the Kira Plastinina brand
+
+### d)Experimental Design
+1. Data Sourcing
+2. Check the Data
+3. Perform Data Cleaning
+4. Analyze the Data
+
+## Data Sourcing
+```{r Data Sourcing}
+shoppers <- read.csv("~/Documents/R markdowns/IP Week 13/online_shoppers_intention.csv")
+
+head(shoppers)
+```
+## Check the Data
+```{r Structure}
+# check the structure of Data
+str(shoppers)
+```
+```{r Dimensions}
+dim(shoppers)
+
+```
+```{r Summary}
+summary(shoppers)
+```
+
+```{r }
+ # convert into a factor
+shoppers$VisitorType <- factor(shoppers$VisitorType)
+head(shoppers$VisitorType)
+
+shoppers$Weekend <- factor(shoppers$Weekend)
+head(shoppers$Weekend)
+
+shoppers$Revenue <- factor(shoppers$Revenue)
+head(shoppers$Revenue)
+
+shoppers$Month <- factor(shoppers$Month)
+head(shoppers$Month)
+```
+
+## Perform Data Cleaning
+```{r Missing values}
+#check for missing values
+colSums(is.na(shoppers))
+
+anyNA(shoppers)
+
+#library("Amelia")
+#missmap(shoppers)
+
+# use MICE to predict missing values
+library("mice")
+mice_mod <- mice(shoppers[, c("Administrative","Administrative_Duration","Informational","Informational_Duration","ProductRelated","ProductRelated","ProductRelated_Duration","BounceRates","ExitRates")], method='rf')
+mice_complete <- complete(mice_mod)
+
+shoppers$Administrative <- mice_complete$Administrative
+shoppers$Administrative_Duration  <- mice_complete$Administrative_Duration
+shoppers$Informational <- mice_complete$Informational
+shoppers$Informational_Duration <- mice_complete$Informational_Duration
+shoppers$ProductRelated <- mice_complete$ProductRelated
+shoppers$ProductRelated_Duration <- mice_complete$ProductRelated_Duration
+shoppers$BounceRates <- mice_complete$BounceRates
+shoppers$ExitRates <- mice_complete$ExitRates
+```
+```{r}
+# Check for any missing values
+anyNA(shoppers)
+```
+
+```{r Duplicates}
+shoppers <- unique(shoppers)
+dim(shoppers)
+
+shoppers[["Administrative"]]
+# There were 117 records that were duplicated
+```
+
+```{r Outliers}
+num_col <- shoppers[ ,c(1,2,3,4,5,6,7,8,9,10,12,13,14,15)]
+
+outlier_detection = function(x){
+  for(i in colnames(x)){
+    boxplot(shoppers[[i]], xlab=i, main=paste0("Boxplot for ",i))
+  }
+}
+
+outlier_detection(num_col)
+
+# Count outliers
+
+#outlier_replace = function(x){
+#    for (i in colnames(x)){
+#       outlier <- boxplot.stats(shoppers[[i]])$out
+        # Replace the values with NA
+#       for(row in 1:nrow(x)){
+#        shoppers[shoppers[row %in% outlier, i]] = NA  
+#       }
+#  }
+#}
+
+#outlier_replace(num_col)
+
+outlier <- boxplot.stats(shoppers[["Region"]])$out
+shoppers[shoppers[["Region"]] %in% outlier, "Region"] = NA
+
+colSums(is.na(shoppers))
+```
+
+## Perform Exploratory Data Analysis  
+
+### Univariate
+
+### Bivariate
+
+### Multivariate
+
+## Implement the Solution
+## Challenge the Solution
+## Follow up Questions
