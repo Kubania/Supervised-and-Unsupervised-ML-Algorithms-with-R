@@ -448,7 +448,7 @@ testing <- features[-intrain,]
 set.seed(42)
 svm_Linear <- train(Clicked.on.Ad ~., data = training, method = "svmLinear",
 trControl=trainControl(method = "repeatedcv", 
-                       number = 10,
+                       numberw = 10,
                        repeats = 3),
                       preProcess = c("center", "scale"))
 
